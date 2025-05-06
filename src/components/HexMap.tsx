@@ -1,11 +1,12 @@
 import React from "react"
-import { HexGrid, Layout, Hexagon, Pattern } from "react-hexgrid"
-import { generateHexMap } from "../utils/generateHexMap"
-import { TileType } from "../types/tile"
+import { HexGrid, Layout, Hexagon } from "react-hexgrid"
+import { TileData, TileType } from "../types/tile"
+import { useCamera } from "../context/CameraContext"
 
-const tiles = generateHexMap(4)
+type Props = {
+  tiles: TileData[]
+}
 
-// Define biome -> fill color map
 const tileColors: Record<TileType, string> = {
   plains: "#a8d8a0",
   forest: "#4caf50",
@@ -24,21 +25,24 @@ const tileColors: Record<TileType, string> = {
   wasteland: "#696969",
 }
 
-const HexMap: React.FC = () => {
+const HexMap: React.FC<Props> = ({ tiles }) => {
+  const { zoom, panX, panY } = useCamera()
+
   return (
     <HexGrid width="100%" height="100%">
-
-      <Layout size={{ x: 5, y: 5 }} flat={true} spacing={1.05} origin={{ x: 0, y: 0 }}>
-        {tiles.map((tile, index) => (
-          <Hexagon
-            key={index}
-            q={tile.q}
-            r={tile.r}
-            s={tile.s}
-            fill={tile.type} // Use biome as pattern ID
-          />
-        ))}
-      </Layout>
+      <g transform={`translate(${panX}, ${panY}) scale(${zoom})`}>
+        <Layout size={{ x: 5, y: 5 }} flat={true} spacing={1.05} origin={{ x: 0, y: 0 }}>
+          {tiles.map((tile, index) => (
+            <Hexagon
+              key={index}
+              q={tile.q}
+              r={tile.r}
+              s={tile.s}
+              style={{ fill: tileColors[tile.type] }}
+            />
+          ))}
+        </Layout>
+      </g>
     </HexGrid>
   )
 }

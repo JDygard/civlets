@@ -1,7 +1,7 @@
 import { TileData } from "../types/tile"
 import { getBiome } from "./biomeGenerator"
 
-export function generateHexMap(radius: number): TileData[] {
+export function generateHexMap(radius: number, offsetQ = 0, offsetR = 0): TileData[] {
   const tiles: TileData[] = []
 
   for (let q = -radius; q <= radius; q++) {
@@ -9,13 +9,15 @@ export function generateHexMap(radius: number): TileData[] {
     const r2 = Math.min(radius, -q + radius)
     for (let r = r1; r <= r2; r++) {
       const s = -q - r
-      const type = getBiome(q, r)
+      const aq = q + offsetQ
+      const ar = r + offsetR
+      const as = -aq - ar
 
       tiles.push({
-        q,
-        r,
-        s,
-        type,
+        q: aq,
+        r: ar,
+        s: as,
+        type: getBiome(aq, ar),
         visible: true,
       })
     }
