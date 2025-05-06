@@ -2,6 +2,7 @@ import React from "react"
 import { HexGrid, Layout, Hexagon } from "react-hexgrid"
 import { TileData, TileType } from "../types/tile"
 import { useCamera } from "../context/CameraContext"
+import { useTile } from "../context/TileContext"
 
 type Props = {
   tiles: TileData[]
@@ -27,20 +28,34 @@ const tileColors: Record<TileType, string> = {
 
 const HexMap: React.FC<Props> = ({ tiles }) => {
   const { zoom, panX, panY } = useCamera()
+  const { hoveredTile, selectedTile, setHoveredTile, setSelectedTile } = useTile()
+
 
   return (
     <HexGrid width="100%" height="100%">
       <g transform={`translate(${panX}, ${panY}) scale(${zoom})`}>
         <Layout size={{ x: 5, y: 5 }} flat={true} spacing={1.05} origin={{ x: 0, y: 0 }}>
-          {tiles.map((tile, index) => (
-            <Hexagon
-              key={index}
-              q={tile.q}
-              r={tile.r}
-              s={tile.s}
-              style={{ fill: tileColors[tile.type] }}
-            />
-          ))}
+          {tiles.map((tile, index) => {
+            const isHovered = hoveredTile?.q === tile.q && hoveredTile.r === tile.r
+            const isSelected = selectedTile?.q === tile.q && selectedTile.r === tile.r
+
+            return (
+              <Hexagon
+                key={index}
+                q={tile.q}
+                r={tile.r}
+                s={tile.s}
+                onMouseEnter={() => setHoveredTile(tile)}
+                onMouseLeave={() => setHoveredTile(null)}
+                onClick={() => setSelectedTile(tile)}
+                style={{
+                  fill: tileColors[tile.type],
+                  stroke: isSelected ? "#FFD700" : isHovered ? "#fff" : "#222",
+                  strokeWidth: 0.5
+                }}
+              />
+            )
+          })}
         </Layout>
       </g>
     </HexGrid>

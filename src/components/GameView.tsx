@@ -5,21 +5,28 @@ import { TileData } from "../types/tile"
 import CameraControls from "./CameraControls"
 import { useCamera } from "../context/CameraContext"
 import { useChunkedTiles } from "../hooks/useChunkedTiles"
+import { TileProvider } from "../context/TileContext"
+import TileTooltip from "./TileTooltip"
+import TileSidebar from "./TileSidebar"
 
 const GameView: React.FC = () => {
     const { centerQ, centerR } = useCamera()
     const tiles = useChunkedTiles(centerQ, centerR)
 
-  return (
-    <div style={{ display: "flex", height: "100vh", width: "100vw" }}>
-      {/* Future: Sidebar, UI panels, top bar, etc. */}
-      <div style={{ flex: 1, position: "relative" }}>
-        <CameraControls>
-        <HexMap tiles={tiles} />
-        </CameraControls>
-      </div>
-    </div>
-  )
+    return (
+        <div style={{ display: "flex", height: "100vh", width: "100vw" }}>
+            {/* Future: Sidebar, UI panels, top bar, etc. */}
+            <div style={{ flex: 1, position: "relative" }}>
+                <CameraControls>
+                    <TileProvider>
+                        <HexMap tiles={tiles} />
+                        <TileTooltip />
+                        <TileSidebar />
+                    </TileProvider>
+                </CameraControls>
+            </div>
+        </div>
+    )
 }
 
 export default GameView
