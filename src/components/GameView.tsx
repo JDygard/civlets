@@ -1,32 +1,48 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect } from "react"
 import { generateHexMap } from "../utils/generateHexMap"
 import HexMap from "./HexMap"
-import { TileData } from "../types/tile"
 import CameraControls from "./CameraControls"
-import { useCamera } from "../context/CameraContext"
-import { useChunkedTiles } from "../hooks/useChunkedTiles"
+import { CameraProvider, useCamera } from "../context/CameraContext"
 import { TileProvider } from "../context/TileContext"
 import TileTooltip from "./TileTooltip"
 import TileSidebar from "./TileSidebar"
+import { MapProvider } from "../context/MapContext"
+import { CivProvider } from "../context/CivContext"
+import { useMap } from "../context/MapContext"
 
 const GameView: React.FC = () => {
-    const { centerQ, centerR } = useCamera()
-    const tiles = useChunkedTiles(centerQ, centerR)
+  const initialTiles = useMemo(() => generateHexMap(4), [])
 
-    return (
-        <div style={{ display: "flex", height: "100vh", width: "100vw" }}>
-            {/* Future: Sidebar, UI panels, top bar, etc. */}
-            <div style={{ flex: 1, position: "relative" }}>
-                <CameraControls>
-                    <TileProvider>
-                        <HexMap tiles={tiles} />
-                        <TileTooltip />
-                        <TileSidebar />
-                    </TileProvider>
-                </CameraControls>
-            </div>
-        </div>
-    )
+  return (
+    <CameraProvider>
+      <MapProvider initialTiles={initialTiles}>
+        <TileProvider>
+          <CivProvider>
+            <CameraControls>
+              <GameWorld />
+            </CameraControls>
+          </CivProvider>
+        </TileProvider>
+      </MapProvider>
+    </CameraProvider>
+  )
+}
+
+const GameWorld: React.FC = () => {
+  const { centerQ, centerR } = useCamera()
+  const { loadChunksAround, tiles } = useMap()
+
+  useEffect(() => {
+    loadChunksAround(centerQ, centerR)
+  }, [centerQ, centerR])
+
+  return (
+    <>
+      <HexMap tiles={tiles} />
+      <TileTooltip />
+      <TileSidebar />
+    </>
+  )
 }
 
 export default GameView

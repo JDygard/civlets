@@ -16,11 +16,15 @@ export type TileType =
   | "fortress"
   | "wasteland"
 
-export interface TileData {
-  q: number
-  r: number
-  s: number
-  type: TileType
-  occupiedBy?: string
-  visible: boolean
-}
+  export interface TileData {
+    q: number
+    r: number
+    s: number
+    type: TileType
+    visible: boolean
+    ownerCivId?: string
+    cultureMap?: Record<string, number> // civId → 0.0–1.0
+    features?: any
+  }
+  
+  
